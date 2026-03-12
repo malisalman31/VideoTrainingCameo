@@ -1,36 +1,82 @@
 import React, { useState } from 'react';
-import { Upload, Play, CheckCircle, MessageSquare, Clock, ArrowRight, User, Video } from 'lucide-react';
+import { Upload, Play, CheckCircle, MessageSquare, Clock, ArrowRight, Video, Sparkles } from 'lucide-react';
 
 const AthleteReviewMVP = () => {
   const [view, setView] = useState('user-submit'); // 'user-submit' | 'athlete-dashboard' | 'review-view'
-  const [file, setFile] = useState(null);
+  const [feedback, setFeedback] = useState('');
+  const [technicalScore, setTechnicalScore] = useState('--');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Mock Data
   const pendingReviews = [
     { id: 1, user: "Marcus J.", sport: "Basketball", drill: "Free Throw Form", duration: "0:45", date: "2h ago" },
     { id: 2, user: "Sarah L.", sport: "Surfing", drill: "Backhand Cutback", duration: "1:12", date: "5h ago" },
   ];
 
+  const userNotes =
+    "I'm struggling with generating speed through the flats. Let me know if my stance is too narrow.";
+
+  const handleGenerateDraft = () => {
+    setIsGenerating(true);
+
+    setTimeout(() => {
+      const mockAiDraft = {
+        strengths: [
+          "Good balance and upper-body control through the transition.",
+          "Strong commitment entering the maneuver.",
+          "You keep a stable line before initiating the turn."
+        ],
+        improvements: [
+          "Your stance looks slightly narrow, which may be limiting power generation.",
+          "Try compressing more through the legs to create speed through the flats.",
+          "Your shoulders open a bit late, which slows the direction change."
+        ],
+        drill: "Practice a low-compression rail-to-rail drill focusing on wider stance and earlier shoulder rotation.",
+        score: "8.2"
+      };
+
+      const formattedDraft = `AI-GENERATED DRAFT REVIEW
+
+STRENGTHS
+- ${mockAiDraft.strengths.join('\n- ')}
+
+AREAS TO IMPROVE
+- ${mockAiDraft.improvements.join('\n- ')}
+
+RECOMMENDED DRILL
+- ${mockAiDraft.drill}
+
+SUMMARY
+- Overall, your technique is solid, but widening your base and improving compression should help you carry more speed and control through flatter sections.`;
+
+      setFeedback(formattedDraft);
+      setTechnicalScore(mockAiDraft.score);
+      setIsGenerating(false);
+    }, 1500);
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-blue-500/30">
-      {/* Top Navigation */}
       <nav className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
               <Video size={18} className="text-white" />
             </div>
-            <span className="font-bold tracking-tight text-lg uppercase">SurfIQ <span className="text-blue-500">Pro</span></span>
+            <span className="font-bold tracking-tight text-lg uppercase">
+              SurfIQ <span className="text-blue-500">Pro</span>
+            </span>
           </div>
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={() => setView('user-submit')}
-              className={`text-sm font-medium ${view === 'user-submit' ? 'text-blue-500' : 'text-zinc-400'}`}>
+              className={`text-sm font-medium ${view === 'user-submit' ? 'text-blue-500' : 'text-zinc-400'}`}
+            >
               Submit Film
             </button>
-            <button 
+            <button
               onClick={() => setView('athlete-dashboard')}
-              className={`text-sm font-medium ${view.includes('athlete') ? 'text-blue-500' : 'text-zinc-400'}`}>
+              className={`text-sm font-medium ${view.includes('athlete') ? 'text-blue-500' : 'text-zinc-400'}`}
+            >
               Athlete Portal
             </button>
           </div>
@@ -38,8 +84,6 @@ const AthleteReviewMVP = () => {
       </nav>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
-        
-        {/* VIEW 1: USER SUBMISSION FLOW */}
         {view === 'user-submit' && (
           <div className="max-w-2xl mx-auto">
             <header className="mb-10 text-center">
@@ -48,7 +92,6 @@ const AthleteReviewMVP = () => {
             </header>
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 space-y-8">
-              {/* Video Dropzone */}
               <div className="border-2 border-dashed border-zinc-700 rounded-lg p-12 flex flex-col items-center justify-center hover:border-blue-500/50 transition-colors cursor-pointer group">
                 <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
                   <Upload size={24} />
@@ -57,11 +100,12 @@ const AthleteReviewMVP = () => {
                 <p className="text-xs text-zinc-500 mt-1">MP4, MOV (Up to 500MB)</p>
               </div>
 
-              {/* Context Area */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-semibold text-zinc-500 mb-2 block">Focus Areas</label>
-                  <textarea 
+                  <label className="text-xs uppercase tracking-widest font-semibold text-zinc-500 mb-2 block">
+                    Focus Areas
+                  </label>
+                  <textarea
                     className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-4 text-sm focus:ring-2 focus:ring-blue-500 outline-none min-h-[120px]"
                     placeholder="e.g. My pop-up feels slow on late drops. Can you check my foot placement?"
                   />
@@ -74,7 +118,6 @@ const AthleteReviewMVP = () => {
           </div>
         )}
 
-        {/* VIEW 2: ATHLETE DASHBOARD */}
         {view === 'athlete-dashboard' && (
           <div className="space-y-8">
             <header className="flex justify-between items-end">
@@ -86,7 +129,7 @@ const AthleteReviewMVP = () => {
 
             <div className="grid gap-4">
               {pendingReviews.map((review) => (
-                <div 
+                <div
                   key={review.id}
                   onClick={() => setView('review-view')}
                   className="group bg-zinc-900 border border-zinc-800 p-6 rounded-xl flex items-center justify-between hover:bg-zinc-800/50 transition-all cursor-pointer"
@@ -113,10 +156,8 @@ const AthleteReviewMVP = () => {
           </div>
         )}
 
-        {/* VIEW 3: CORE REVIEW WORKFLOW (THE PLAYER) */}
         {view === 'review-view' && (
           <div className="grid lg:grid-cols-3 gap-8 h-[calc(100vh-200px)]">
-            {/* Video Player Column */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               <div className="aspect-video bg-black rounded-xl overflow-hidden relative flex items-center justify-center border border-zinc-800 shadow-2xl">
                 <Play size={64} className="text-blue-500 opacity-50" />
@@ -134,51 +175,65 @@ const AthleteReviewMVP = () => {
                   </div>
                 </div>
               </div>
+
               <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
                 <h4 className="text-xs uppercase tracking-widest font-semibold text-zinc-500 mb-2">User Notes</h4>
-                <p className="text-zinc-300 italic">"I'm struggling with generating speed through the flats. Let me know if my stance is too narrow."</p>
+                <p className="text-zinc-300 italic">"{userNotes}"</p>
               </div>
             </div>
 
-            {/* Feedback Column */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col shadow-xl">
               <div className="p-6 border-b border-zinc-800 flex items-center gap-2">
                 <MessageSquare size={18} className="text-blue-500" />
                 <h2 className="font-bold uppercase tracking-tight">Pro Feedback</h2>
               </div>
-              
+
               <div className="p-6 flex-1 space-y-6">
+                <button
+                  onClick={handleGenerateDraft}
+                  disabled={isGenerating}
+                  className={`w-full font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
+                    isGenerating
+                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-500 text-white'
+                  }`}
+                >
+                  <Sparkles size={18} />
+                  {isGenerating ? 'Analyzing Technique...' : 'Generate AI Draft'}
+                </button>
+
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase font-bold text-zinc-500">The Breakdown</label>
-                  <textarea 
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
                     className="w-full h-64 bg-transparent border border-zinc-800 rounded-lg p-4 text-sm focus:ring-1 focus:ring-blue-500 outline-none resize-none"
                     placeholder="Provide your analysis here... frame by frame."
                   />
                 </div>
 
                 <div className="space-y-3">
-                   <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
-                     <span className="text-sm">Technical Score</span>
-                     <span className="text-blue-500 font-bold text-xl">8.2</span>
-                   </div>
+                  <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                    <span className="text-sm">Technical Score</span>
+                    <span className="text-blue-500 font-bold text-xl">{technicalScore}</span>
+                  </div>
                 </div>
               </div>
 
               <div className="p-6 border-t border-zinc-800">
-                <button 
+                <button
                   onClick={() => setView('athlete-dashboard')}
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
                   <CheckCircle size={18} /> Finalize Review
                 </button>
               </div>
             </div>
           </div>
         )}
-
       </main>
     </div>
   );
 };
-
 
 export default AthleteReviewMVP;
